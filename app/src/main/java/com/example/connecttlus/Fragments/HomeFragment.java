@@ -3,6 +3,7 @@ package com.example.connecttlus.Fragments;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -51,8 +52,10 @@ public class HomeFragment extends Fragment {
     hAdapter hadapter;
     iAdapter iAdapter;
     private final String event = "getDSactivity";
-    private final int page = 0;
+    private int page = 0;
     private final int record = 15;
+    private int pastVisibleItems, visibleItemsCount, totalItemsCount, previous_total = 0;
+    private boolean isLoading = true;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -108,6 +111,26 @@ public class HomeFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         rimg.setLayoutManager(linearLayoutManager);
         getActi();
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (!recyclerView.canScrollVertically(1)) {
+                    visibleItemsCount = linearLayoutManager.getChildCount();
+                    totalItemsCount = linearLayoutManager.getItemCount();
+                    pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition();
+                    if (isLoading)
+                        if (totalItemsCount > previous_total) {
+                            isLoading = false;
+                            previous_total = totalItemsCount;
+                        }
+                    if (!isLoading && (totalItemsCount - visibleItemsCount) <= (pastVisibleItems + record)) {
+                        loadMoreActi();
+                        isLoading = true;
+                    }
+                }
+            }
+        });
         return view;
     }
 
@@ -119,6 +142,21 @@ public class HomeFragment extends Fragment {
                 iAdapter = new iAdapter(getContext(),listActiviy);
                 rimg.setAdapter(iAdapter);
                 rimg.setItemAnimator(new DefaultItemAnimator());
+            }
+
+            @Override
+            public void onFailure(Call<getActivity> call, Throwable t) {
+                Toast.makeText(getContext(),t.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+    private void loadMoreActi(){
+        page++;
+        ApiClient.getApiService().getDSactivity(event,page,record).enqueue(new Callback<getActivity>() {
+            @Override
+            public void onResponse(Call<getActivity> call, Response<getActivity> response) {
+                listActiviy = response.body().getItems();
+                iAdapter.addActivity(listActiviy);
             }
 
             @Override
