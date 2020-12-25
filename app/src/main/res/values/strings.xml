@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">ConnectTLUS</string>
+    <string name="bni1">Hoạt động</string>
+    <string name="bni2">Tài liệu</string>
+    <string name="bni3">Thông báo</string>
+    <string name="bni4">Thông tin</string>
+    <string name="txtsv">
+       <u>Mã sinh viên</u>
+    </string>
+    <string name="title_activity_scrolling">ScrollingActivity</string>
+    <string name="action_settings">Settings</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Strings used for fragments for navigation -->
+
+</resources>
